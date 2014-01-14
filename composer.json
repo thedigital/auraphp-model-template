@@ -19,6 +19,5 @@
     },
     "autoload": {
         "files": ["autoload.php"]
-        }
     }
 }
