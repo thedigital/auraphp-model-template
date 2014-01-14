@@ -4,7 +4,7 @@
     "keywords": [
         "model"
     ],
-    "license": "BSD",
+    "license": "BSD-2-Clause",
     "authors": [
         {
             "name": "Guillaume Ferrand",
@@ -18,8 +18,7 @@
         "aura/sql-schema": "2.0.*@dev"
     },
     "autoload": {
-        "psr-4": {
-            "Thedigital\\Model_Template\\": "src/"
+        "files": ["autoload.php"]
         }
     }
 }
