@@ -1,0 +1,25 @@
+{
+    "name": "thedigital/auraphp-model-template",
+    "description": "Aurav2 Model Template",
+    "keywords": [
+        "model"
+    ],
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Guillaume Ferrand",
+            "email": "guillaume.ferrand@gmail.com",
+            "homepage": "https://github.com/thedigital"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+	"mbrevda/aurasql-queryproxy": "dev-master",
+	"aura/sql-schema": "2.0.*@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Thedigital\\Rest\\": "src/"
+        }
+    }
+}
