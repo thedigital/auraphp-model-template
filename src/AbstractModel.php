@@ -47,7 +47,7 @@ abstract class AbstractModel
 
     private function getPrimaryKey()
     {
-        $cols = $this->schema_described->fetchTableCols($this->getConnection()->quote($this->schema) . '.' . $this->getConnection()->quote($this->table));
+        $cols = $this->schema_described->fetchTableCols($this->schema . '.' . $this->table);
 
         foreach ($cols as $name => $col) {
             if($col->primary === true) {
@@ -74,7 +74,7 @@ abstract class AbstractModel
 
     public function find($value)
     {
-        $text = 'SELECT * FROM ' . $this->getConnection()->quote($this->schema) . '.' . $this->getConnection()->quote($this->table) . ' where ' . $this->getPrimaryKey() . ' = :primaryValue';
+        $text = 'SELECT * FROM "' . $this->schema . '"."' . $this->table . '" where ' . $this->getPrimaryKey() . ' = :primaryValue';
 
         // values to bind to query placeholders
         $bind = [
@@ -88,7 +88,7 @@ abstract class AbstractModel
 
     public function fetchAll()
     {
-        $text = 'SELECT * FROM ' . $this->getConnection()->quote($this->schema) . '.' . $this->getConnection()->quote($this->table);
+        $text = 'SELECT * FROM "' . $this->schema . '"."' . $this->table . '"';
 
         $data = $this->getConnection()->fetchAll($text);
 
