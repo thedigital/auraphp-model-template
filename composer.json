@@ -18,6 +18,8 @@
         "aura/sql-schema": "2.0.*@dev"
     },
     "autoload": {
-        "files": ["autoload.php"]
+        "psr-4": {
+            "Thedigital\\Model_Template\\": "src/"
+        }
     }
 }
