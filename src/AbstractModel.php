@@ -2,8 +2,8 @@
 namespace Thedigital\Model_Template;
 
 use Mbrevda\Queryproxy\Db;
-use Aura\Sql_Schema\ColumnFactory;
-use Aura\Sql_Schema\PgsqlSchema;
+use Aura\SqlSchema\ColumnFactory;
+use Aura\SqlSchema\PgsqlSchema;
 
 abstract class AbstractModel
 {
