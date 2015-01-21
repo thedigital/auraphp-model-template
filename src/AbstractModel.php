@@ -18,15 +18,16 @@ abstract class AbstractModel
     public function __construct(Db $db_connection)
     {
         $this->db_connection = $db_connection;
-        $this->db_connection->exec("SET application_name = 'fl-dashboard'");
-        $this->db_connection->exec("select pg_sleep(5)");
-
 
         $this->column_factory = new ColumnFactory();
         $this->schema_described = new PgsqlSchema($this->db_connection, $this->column_factory);
     }
 
-
+    public function setApplicationName($application_name)
+    {
+        $this->db_connection->exec('SET application_name = "'.$application_name.'"');
+        $this->db_connection->exec('select pg_sleep(3)');
+    }
 
     public function getConnection()
     {
