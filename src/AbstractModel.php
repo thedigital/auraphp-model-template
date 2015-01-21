@@ -25,7 +25,7 @@ abstract class AbstractModel
 
     public function setApplicationName($application_name)
     {
-        $this->db_connection->exec('SET application_name = "'.$application_name.' / ' . get_called_class() . '"');
+        $this->db_connection->exec('SET application_name = "'.$application_name.' / 1234567890AZERTYUIOPQSDFGHJKLMWXCVBN_1234567890AZERTYUIOPQSDFGHJKLMWXCVBN' . get_called_class() . '"');
         $this->db_connection->exec('select pg_sleep(3)');
     }
 
