@@ -28,6 +28,14 @@ abstract class AbstractModel
         $this->db_connection->exec('SET application_name = "' . $application_name . ' : ' . get_called_class() . '"');
     }
 
+    public function setSleep($sleep_time)
+    {
+        if (!is_numeric($sleep_time) || $sleep_time > 30) {
+            $sleep_time = 30;
+        }
+        $this->db_connection->exec('select pg_sleep('.$sleep_time.')');
+    }
+
     public function getConnection()
     {
         return $this->db_connection;
