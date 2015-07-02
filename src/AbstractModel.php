@@ -15,6 +15,8 @@ abstract class AbstractModel
 
     protected $primaryKey = null;
 
+    protected $context = null;
+
     public function __construct(Db $db_connection)
     {
         $this->db_connection = $db_connection;
@@ -39,6 +41,11 @@ abstract class AbstractModel
     public function getConnection()
     {
         return $this->db_connection;
+    }
+
+    public function setContext($context)
+    {
+        $this->context = $context;
     }
 
 /*
