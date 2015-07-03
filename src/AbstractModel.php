@@ -114,4 +114,30 @@ abstract class AbstractModel
 
         return $data;
     }
+
+    /* Generic update with clauses et datas */
+    public function updateAbstract($clauses, $datas)
+    {
+        $result = $this->getConnection()
+            ->update()
+            ->table($this->schema.'.'.$this->table)
+            ->cols($data)
+            ->where($clauses)
+            //->bindValues($datas)
+            ->returning($this->getPrimaryKey())
+            ->fetchOne();
+        return $result;
+    }
+
+    /* Generic insert with clauses et datas */
+    public function insertAbstract($data)
+    {
+        $result = $this->getConnection()
+            ->insert()
+            ->into($this->schema.'.'.$this->table)
+            ->cols($data)
+            ->returning($this->getPrimaryKey())
+            ->fetchOne();
+        return $result;
+    }
 }
