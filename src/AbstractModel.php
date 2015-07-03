@@ -124,20 +124,43 @@ abstract class AbstractModel
             ->cols($data)
             ->where($clauses)
             //->bindValues($datas)
-            ->returning($this->getPrimaryKey())
+            ->returning([$this->getPrimaryKey()])
             ->fetchOne();
         return $result;
     }
 
-    /* Generic insert with clauses et datas */
-    public function insertAbstract($data)
+    /* Generic insert with 1-N datas */
+    public function insert($data)
     {
-        $result = $this->getConnection()
-            ->insert()
-            ->into($this->schema.'.'.$this->table)
-            ->cols($data)
-            ->returning($this->getPrimaryKey())
-            ->fetchOne();
-        return $result;
+        // if empty $data given
+        if (count($data) == 0) {
+            return [];
+        } else {
+            $datas = $data;
+            $results = [];
+
+            // if array dimension == 1, we put the $data in any array so we can iterate just like a N $data
+            if (count($data) == count($data, COUNT_RECURSIVE)) {
+                $datas = [$data];
+            }
+
+            // we iterate on $datas
+            foreach ($datas as $data_iter) {
+                $result = $this->getConnection()
+                    ->insert()
+                    ->into($this->schema.'.'.$this->table)
+                    ->cols($data_iter)
+                    ->returning([$this->getPrimaryKey()])
+                    ->fetchOne();
+            }
+            $results[] = $result;
+        }
+
+        // if only one result : we give results
+        if (count($results) == 1) {
+            return $results[0];
+        } else { // else we give array of results
+            return $results;
+        }
     }
 }
