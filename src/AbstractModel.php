@@ -134,7 +134,7 @@ abstract class AbstractModel
     {
         // if empty $data given
         if (count($data) == 0) {
-            return [];
+            return null;
         } else {
             $datas = $data;
             $results = [];
@@ -152,8 +152,8 @@ abstract class AbstractModel
                     ->cols($data_iter)
                     ->returning([$this->getPrimaryKey()])
                     ->fetchOne();
+                $results[] = $result;
             }
-            $results[] = $result;
         }
 
         // if only one result : we give results
