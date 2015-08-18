@@ -23,6 +23,11 @@ abstract class AbstractModel
 
         $this->column_factory = new ColumnFactory();
         $this->schema_described = new PgsqlSchema($this->db_connection, $this->column_factory);
+
+        // if primaryKey not known yet, we look for it (so it's done only once)
+        if ($this->primaryKey == null) {
+            $this->getPrimaryKey();
+        }
     }
 
     public function setApplicationName($application_name)
@@ -92,45 +97,34 @@ abstract class AbstractModel
         return $this;
     }
 
+    /*
+     * Generic select for one line with primary key
+     * */
     public function find($value)
     {
-        $text = 'SELECT * FROM "' . $this->schema . '"."' . $this->table . '" where ' . $this->getPrimaryKey() . ' = :primaryValue';
-
-        // values to bind to query placeholders
-        $bind = [
-            'primaryValue' => $value,
-        ];
-
-        $data = $this->getConnection()->fetchOne($text, $bind);
-
-        return $this->fill($data);
+        return $this->fetchOne([[$this->primaryKey, '=', $value]]);
     }
 
-    public function fetchAll()
+
+    /*
+     * Generic update with clauses et datas
+     * */
+    final public function updateAbstract($clauses, $datas)
     {
-        $text = 'SELECT * FROM "' . $this->schema . '"."' . $this->table . '"';
-
-        $data = $this->getConnection()->fetchAll($text);
-
-        return $data;
-    }
-
-    /* Generic update with clauses et datas */
-    public function updateAbstract($clauses, $datas)
-    {
-        $result = $this->getConnection()
+        return $this->getConnection()
             ->update()
             ->table($this->schema.'.'.$this->table)
             ->cols($data)
             ->where($clauses)
             //->bindValues($datas)
-            ->returning([$this->getPrimaryKey()])
+            ->returning([$this->primaryKey])
             ->fetchOne();
-        return $result;
     }
 
-    /* Generic insert with 1-N datas */
-    public function insert($data)
+    /*
+     * Generic insert with 1-N datas
+     * */
+    final public function insert($data)
     {
         // if empty $data given
         if (count($data) == 0) {
@@ -150,7 +144,7 @@ abstract class AbstractModel
                     ->insert()
                     ->into($this->schema.'.'.$this->table)
                     ->cols($data_iter)
-                    ->returning([$this->getPrimaryKey()])
+                    ->returning([$this->primaryKey])
                     ->fetchOne();
                 $results[] = $result;
             }
@@ -162,5 +156,64 @@ abstract class AbstractModel
         } else { // else we give array of results
             return $results;
         }
+    }
+
+    /*
+     * Generic select for 1 line with 1-N clauses
+     *
+     * $clauses = [
+     *      ['key', 'operator', 'value'],
+     *      ['key', 'operator', 'value'],
+     *      ['key', 'is null'],
+     * ]
+     *
+     * $cols = ['col1', 'col2', 'col3', ... ]
+     *
+     * */
+    final public function fetchOne($clauses = [], $cols = [])
+    {
+        return $this->fetch($clauses, $cols)->fetchOne();
+    }
+
+
+    /*
+     * Generic select for N line with 1-N clauses
+     *
+     * $clauses = [
+     *      ['key', 'operator', 'value'],
+     *      ['key', 'operator', 'value'],
+     *      ['key', 'is null'],
+     * ]
+     *
+     * $cols = ['col1', 'col2', 'col3', ... ]
+     *
+     * */
+    final public function fetchAll($clauses = [], $cols = [])
+    {
+        return $this->fetch($clauses, $cols)->fetchAll();
+    }
+
+
+    /*
+     * Generic fetch for any SQL select
+     * */
+    final private function fetch($clauses = [], $cols = ['*']) {
+        $select_stmt = $this->getConnection()->select();
+
+        if (count($cols) > 0) {
+            $select_stmt->cols($cols);
+        } else {
+            $select_stmt->cols(['*']);
+        }
+
+        $select_stmt->from($this->schema.'.'.$this->table);
+
+        if (count($clauses) > 0) {
+            foreach ($clauses as $clause) {
+                $select_stmt->where(implode(' ', $clause));
+            }
+        }
+
+        return $select_stmt;
     }
 }
