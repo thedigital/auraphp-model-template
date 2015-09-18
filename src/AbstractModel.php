@@ -102,7 +102,7 @@ abstract class AbstractModel
      * */
     public function find($value)
     {
-        return $this->fetchOne([[$this->primaryKey, '=', $value]]);
+        return $this->fetch([[$this->primaryKey, '=', $value]])->fetchObject();
     }
 
 
