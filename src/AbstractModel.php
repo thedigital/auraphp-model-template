@@ -210,7 +210,12 @@ abstract class AbstractModel
 
         if (count($clauses) > 0) {
             foreach ($clauses as $clause) {
-                $select_stmt->where(implode(' ', $clause));
+                // $select_stmt->where(implode(' ', $clause));
+                if (count($clause) == 3) {
+                    $select_stmt->where($clause[0] . ' ' . $clause[1] . ' ?', $clause[2]);
+                } else {
+                    $select_stmt->where(implode(' ', $clause));
+                }
             }
         }
 
