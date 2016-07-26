@@ -17,6 +17,16 @@ abstract class AbstractModel
 
     protected $context = null;
 
+    protected $schema = null;
+
+    protected $table = null;
+
+
+    public function getTable()
+    {
+        return $this->table;
+    }
+
     public function __construct(Db $db_connection)
     {
         $this->db_connection = $db_connection;
@@ -70,14 +80,17 @@ abstract class AbstractModel
         return $this->db_connection->$connection($name);
     }*/
 
-    private function getPrimaryKey()
+    public function getPrimaryKey()
     {
-        $cols = $this->schema_described->fetchTableCols($this->schema . '.' . $this->table);
+        // if primaryKey not known yet, we look for it (so it's done only once)
+        if ($this->primaryKey == null) {
+            $cols = $this->schema_described->fetchTableCols($this->schema . '.' . $this->table);
 
-        foreach ($cols as $name => $col) {
-            if($col->primary === true) {
-                $this->primaryKey = $name;
-                continue;
+            foreach ($cols as $name => $col) {
+                if($col->primary === true) {
+                    $this->primaryKey = $name;
+                    continue;
+                }
             }
         }
 
@@ -117,8 +130,8 @@ abstract class AbstractModel
             ->cols($data)
             ->where($clauses)
             //->bindValues($datas)
-            ->returning([$this->primaryKey])
-            ->fetchOne();
+            ->returning(['*'])
+            ->fetchObject();
     }
 
     /*
@@ -144,8 +157,8 @@ abstract class AbstractModel
                     ->insert()
                     ->into($this->schema.'.'.$this->table)
                     ->cols($data_iter)
-                    ->returning([$this->primaryKey])
-                    ->fetchOne();
+                    ->returning(['*'])
+                    ->fetchObject();
                 $results[] = $result;
             }
         }
@@ -172,7 +185,7 @@ abstract class AbstractModel
      * */
     final public function fetchOne($clauses = [], $cols = [])
     {
-        return $this->fetch($clauses, $cols)->fetchOne();
+        return $this->fetch($clauses, $cols)->fetchObject();
     }
 
 
@@ -190,7 +203,7 @@ abstract class AbstractModel
      * */
     final public function fetchAll($clauses = [], $cols = [])
     {
-        return $this->fetch($clauses, $cols)->fetchAll();
+        return $this->fetch($clauses, $cols)->fetchObjects();
     }
 
 
