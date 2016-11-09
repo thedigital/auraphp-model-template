@@ -21,6 +21,8 @@ abstract class AbstractModel
 
     protected $table = null;
 
+    protected $data_internal = null;
+
 
     public function getTable()
     {
@@ -38,6 +40,16 @@ abstract class AbstractModel
         if ($this->primaryKey == null) {
             $this->getPrimaryKey();
         }
+    }
+
+    public function setDataInternal($value)
+    {
+        $this->data_internal = $value;
+    }
+
+    public function getDataInternal()
+    {
+        return $this->data_internal;
     }
 
     public function setApplicationName($application_name)
@@ -62,6 +74,7 @@ abstract class AbstractModel
     {
         $this->context = $context;
     }
+
 
 /*
     public function getConnection($type = null, $name = null)
@@ -109,6 +122,7 @@ abstract class AbstractModel
         }
         return $this;
     }
+    
 
     /*
      * Generic select for one line with primary key
