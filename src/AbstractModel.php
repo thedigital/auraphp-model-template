@@ -17,6 +17,8 @@ abstract class AbstractModel
 
     protected $context = null;
 
+    protected $data_internal = null;
+
     public function __construct(Db $db_connection)
     {
         $this->db_connection = $db_connection;
@@ -28,6 +30,16 @@ abstract class AbstractModel
         if ($this->primaryKey == null) {
             $this->getPrimaryKey();
         }
+    }
+
+    public function setDataInternal($value)
+    {
+        $this->data_internal = $value;
+    }
+
+    public function getDataInternal()
+    {
+        return $this->data_internal;
     }
 
     public function setApplicationName($application_name)
