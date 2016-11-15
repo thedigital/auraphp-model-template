@@ -24,6 +24,7 @@ abstract class AbstractModel
 
     protected $data_internal = null;
 
+    protected $driver = null;
 
     public function getTable()
     {
@@ -36,9 +37,11 @@ abstract class AbstractModel
 
         $this->column_factory = new ColumnFactory();
 
-        if (preg_match('/^pgsql/', strtolower($db_connection->getDsn()))) {
+	if (preg_match('/^pgsql/', strtolower($db_connection->getDsn()))) {
+	    $this->driver = 'pgsql';
             $this->schema_described = new PgsqlSchema($this->db_connection, $this->column_factory);
         } elseif (preg_match('/^mysql/', strtolower($db_connection->getDsn()))) {
+	    $this->driver = 'mysql';
             $this->schema_described = new MysqlSchema($this->db_connection, $this->column_factory);
         }
 
@@ -144,14 +147,17 @@ abstract class AbstractModel
      * */
     final public function updateAbstract($clauses, $datas)
     {
-        return $this->getConnection()
+        $stmt = $this->getConnection()
             ->update()
             ->table($this->schema.'.'.$this->table)
             ->cols($data)
-            ->where($clauses)
-            //->bindValues($datas)
-            ->returning(['*'])
-            ->fetchObject();
+	    ->where($clauses);
+
+	if ($this->driver == 'pgsql') {
+	    $stmt = $stmt->returning(['*']);
+	}
+	
+	return $stmt->fetchObject();
     }
 
     /*
@@ -173,12 +179,17 @@ abstract class AbstractModel
 
             // we iterate on $datas
             foreach ($datas as $data_iter) {
-                $result = $this->getConnection()
+                $stmt = $this->getConnection()
                     ->insert()
                     ->into($this->schema.'.'.$this->table)
-                    ->cols($data_iter)
-                    ->returning(['*'])
-                    ->fetchObject();
+                    ->cols($data_iter);
+
+		if ($this->driver == 'pgsql') {
+          	    $stmt = $stmt->returning(['*']);
+	        }
+
+		$result = $stmt->fetchObject();
+	
                 $results[] = $result;
             }
         }
