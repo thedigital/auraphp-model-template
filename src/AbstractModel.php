@@ -154,7 +154,7 @@ abstract class AbstractModel
 	    ->where($clauses);
 
 	if ($this->driver == 'pgsql') {
-	    $stmt = $stmt->returning(['*']);
+	    $stmt->returning(['*']);
 	}
 	
 	return $stmt->fetchObject();
@@ -185,7 +185,7 @@ abstract class AbstractModel
                     ->cols($data_iter);
 
 		if ($this->driver == 'pgsql') {
-          	    $stmt = $stmt->returning(['*']);
+          	    $stmt->returning(['*']);
 	        }
 
 		$result = $stmt->fetchObject();
