@@ -2,8 +2,9 @@
 namespace Thedigital\Model_Template;
 
 use Mbrevda\Queryproxy\Db;
-use Aura\SqlSchema\ColumnFactory;
-use Aura\SqlSchema\PgsqlSchema;
+use Thedigital\SqlSchema\ColumnFactory;
+use Thedigital\SqlSchema\PgsqlSchema;
+use Thedigital\SqlSchema\MysqlSchema;
 
 abstract class AbstractModel
 {
@@ -34,7 +35,12 @@ abstract class AbstractModel
         $this->db_connection = $db_connection;
 
         $this->column_factory = new ColumnFactory();
-        $this->schema_described = new PgsqlSchema($this->db_connection, $this->column_factory);
+
+        if (preg_match('/^pgsql/', strtolower($db_connection->getDsn()))) {
+            $this->schema_described = new PgsqlSchema($this->db_connection, $this->column_factory);
+        } elseif (preg_match('/^mysql/', strtolower($db_connection->getDsn()))) {
+            $this->schema_described = new MysqlSchema($this->db_connection, $this->column_factory);
+        }
 
         // if primaryKey not known yet, we look for it (so it's done only once)
         if ($this->primaryKey == null) {
@@ -122,7 +128,7 @@ abstract class AbstractModel
         }
         return $this;
     }
-    
+
 
     /*
      * Generic select for one line with primary key
