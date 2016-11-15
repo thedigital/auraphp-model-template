@@ -17,11 +17,6 @@
         "mbrevda/aurasql-queryproxy": "master",
         "thedigital/sqlschema": "2.0.3.1"
     },
-    "repositories": [{
-         "type": "vcs",
-         "url": "https://github.com/thedigital/thedigital.sqlschema"
-    }],
-
     "autoload": {
         "psr-4": {
             "Thedigital\\Model_Template\\": "src/"
