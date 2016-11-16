@@ -37,11 +37,11 @@ abstract class AbstractModel
 
         $this->column_factory = new ColumnFactory();
 
-	if (preg_match('/^pgsql/', strtolower($db_connection->getDsn()))) {
-	    $this->driver = 'pgsql';
+    if (preg_match('/^pgsql/', strtolower($db_connection->getDsn()))) {
+        $this->driver = 'pgsql';
             $this->schema_described = new PgsqlSchema($this->db_connection, $this->column_factory);
         } elseif (preg_match('/^mysql/', strtolower($db_connection->getDsn()))) {
-	    $this->driver = 'mysql';
+        $this->driver = 'mysql';
             $this->schema_described = new MysqlSchema($this->db_connection, $this->column_factory);
         }
 
@@ -151,13 +151,16 @@ abstract class AbstractModel
             ->update()
             ->table($this->schema.'.'.$this->table)
             ->cols($data)
-	    ->where($clauses);
+        ->where($clauses);
 
-	if ($this->driver == 'pgsql') {
-	    $stmt->returning(['*']);
-	}
-	
-	return $stmt->fetchObject();
+    if ($this->driver == 'pgsql') {
+        $stmt->returning(['*']);
+        return $stmt->fetchObject();
+    } elseif ($this->driver == 'mysql') {
+        return $stmt->exec();
+    }
+
+
     }
 
     /*
@@ -184,12 +187,17 @@ abstract class AbstractModel
                     ->into($this->schema.'.'.$this->table)
                     ->cols($data_iter);
 
-		if ($this->driver == 'pgsql') {
-          	    $stmt->returning(['*']);
-	        }
+                if ($this->driver == 'pgsql') {
+                    $stmt->returning(['*']);
+                    $result = $stmt->fetchObject();
+                } elseif ($this->driver == 'mysql') {
+                    if ($stmt->exec()) {
+                        $result = (int) $this->getConnection()->lastInsertId();
+                    } else {
+                        $result = null;
+                    }
+                }
 
-		$result = $stmt->fetchObject();
-	
                 $results[] = $result;
             }
         }
