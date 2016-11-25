@@ -145,7 +145,7 @@ abstract class AbstractModel
     /*
      * Generic update with clauses et datas
      * */
-    final public function updateAbstract($clauses, $datas)
+    final public function updateAbstract($clauses, $data)
     {
         $stmt = $this->getConnection()
             ->update()
