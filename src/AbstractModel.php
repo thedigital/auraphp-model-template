@@ -153,14 +153,48 @@ abstract class AbstractModel
             ->cols($data)
         ->where($clauses);
 
-    if ($this->driver == 'pgsql') {
-        $stmt->returning(['*']);
-        return $stmt->fetchObject();
-    } elseif ($this->driver == 'mysql') {
-        return $stmt->exec();
+        if ($this->driver == 'pgsql') {
+            $stmt->returning(['*']);
+            return $stmt->fetchObject();
+        } elseif ($this->driver == 'mysql') {
+            return $stmt->exec();
+        }
     }
 
 
+    /*
+     * Generic update with clauses et datas
+     * */
+    final public function update($clauses, $data)
+    {
+        // if empty $data given
+        if (count($data) == 0) {
+            return null;
+        } else {
+            $result = $this->getConnection()
+                ->update()
+                ->table($this->schema.'.'.$this->table)
+                ->cols($data);
+
+
+            foreach ($clauses as $clause) {
+                // $select_stmt->where(implode(' ', $clause));
+                if (count($clause) == 3) {
+                    $result->where($clause[0] . ' ' . $clause[1] . ' ?', $clause[2]);
+                } else {
+                    $result->where(implode(' ', $clause));
+                }
+            }
+
+            if ($this->driver == 'pgsql') {
+                $result->returning(['*']);
+                return $result->fetchObject();
+            } elseif ($this->driver == 'mysql') {
+                return $result->exec();
+            }
+
+            return $result->fetchObject();
+        }
     }
 
     /*
